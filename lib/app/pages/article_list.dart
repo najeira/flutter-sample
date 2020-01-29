@@ -4,7 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_sample/app/blocs/blocs.dart';
 import 'package:flutter_sample/app/helpers/datetime.dart';
+
 import 'package:flutter_sample/domain/domain.dart';
+
+import 'article_detail.dart';
 
 class ArticleListPage extends StatelessWidget {
   @override
@@ -86,18 +89,19 @@ class ArticleListTile extends StatelessWidget {
         final Article article = state.data;
         debugPrint("ArticleListTile ${article?.id}");
         return ListTile(
-          leading: Icon(
+          title: Hero(
+            tag: "article-title-${article.id}",
+            child: Material(
+              child: Text(article.title),
+            ),
+          ),
+          subtitle: Text(formatDateTime(article.startAt)),
+          trailing: Icon(
             article.favorite ? Icons.favorite : Icons.favorite_border,
             color: article.favorite ? accentColor : null,
           ),
-          title: Text(article.title),
-          subtitle: Text(formatDateTime(article.startAt)),
-          trailing: const Icon(
-            Icons.arrow_forward_ios,
-            size: 14.0,
-          ),
           onTap: () {
-            // ArticleDetailPage.push(context, article);
+            ArticleDetailPage.push(context, article);
           },
         );
       },
