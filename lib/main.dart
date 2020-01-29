@@ -22,25 +22,14 @@ void main() {
   runApp(MaterialApp(
     theme: ThemeData.dark().copyWith(
       accentColor: Colors.amberAccent,
-      pageTransitionsTheme: const MyPageTransitionsTheme(),
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: <TargetPlatform, PageTransitionsBuilder>{
+          TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+        },
+      ),
     ),
     home: ArticleListPage(),
   ));
-}
-
-class MyPageTransitionsTheme extends PageTransitionsTheme {
-  const MyPageTransitionsTheme();
-
-  static const PageTransitionsBuilder builder = CupertinoPageTransitionsBuilder();
-
-  @override
-  Widget buildTransitions<T>(
-    PageRoute<T> route,
-    BuildContext context,
-    Animation<double> animation,
-    Animation<double> secondaryAnimation,
-    Widget child,
-  ) {
-    return builder.buildTransitions<T>(route, context, animation, secondaryAnimation, child);
-  }
 }
