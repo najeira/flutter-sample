@@ -47,6 +47,9 @@ class Article {
   final int limit;
   final int accepted;
   final int waiting;
+
+  @JsonKey(ignore: true)
+  bool favorite = false;
 }
 
 @JsonSerializable(createToJson: false)

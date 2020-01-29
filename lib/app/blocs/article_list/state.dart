@@ -17,3 +17,7 @@ class ArticleListLoadProgress extends ArticleListState {
 class ArticleListLoadSuccess extends ArticleListState {
   const ArticleListLoadSuccess(ArticleList data) : super(data);
 }
+
+class ArticleListLoadFinish extends ArticleListState {
+  const ArticleListLoadFinish(ArticleList data) : super(data);
+}
