@@ -1,9 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 
-import 'package:flutter_sample/app/helpers/service_locator.dart';
-
 import 'package:flutter_sample/domain/domain.dart';
+
+import 'package:flutter_sample/helpers/get_it.dart';
 
 import 'event.dart';
 import 'state.dart';
