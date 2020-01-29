@@ -1,122 +1,87 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_sample/app/blocs/word/event.dart';
 import 'package:provider/provider.dart';
 
-import 'package:flutter_sample/app/blocs/word/bloc.dart';
-import 'package:flutter_sample/app/blocs/word/state.dart';
+import 'package:flutter_sample/app/blocs/blocs.dart';
+import 'package:flutter_sample/domain/domain.dart';
 
-import 'package:flutter_sample/domain/models/word.dart';
-
-class HomePage extends StatelessWidget {
+class ArticleListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<WordShowBloc>(
-      create: (BuildContext context) => WordShowBloc()..add(const WordNext()),
-      child: HomeView(),
+    return BlocProvider<ArticleListBloc>(
+      create: (BuildContext context) => ArticleListBloc()..add(const ArticleListStart()),
+      child: const ArticleListView(),
     );
   }
 }
 
-class WordNotifier extends ValueNotifier<Word> {
-  WordNotifier(Word value) : super(value);
-}
+class ArticleListView extends StatelessWidget {
+  const ArticleListView();
 
-class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('英単語帳'),
+        title: const Text("Flutter勉強会"),
       ),
-      body: ChangeNotifierProvider<WordNotifier>(
-        create: (BuildContext context) => WordNotifier(null),
-        child: BlocConsumer<WordShowBloc, WordState>(
-          listener: (BuildContext context, WordState state) {
-            final WordNotifier notifier = Provider.of<WordNotifier>(context, listen: false);
-            notifier.value = state.word;
-          },
-          builder: (BuildContext context, WordState state) {
-            debugPrint("HomeView ${state.word?.word}");
-            return GestureDetector(
-              onTap: () {
-                BlocProvider.of<WordShowBloc>(context).add(const WordNext());
-              },
-              child: Container(
-                color: Colors.white,
-                child: Stack(
-                  children: <Widget>[
-                    ValueListenableProvider<Word>.value(
-                      value: Provider.of<WordNotifier>(context, listen: false),
-                      child: const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: WordView(),
-                      ),
+      body: BlocBuilder<ArticleListBloc, ArticleListState>(
+        builder: (BuildContext context, ArticleListState state) {
+          final bool loading = state is ArticleListLoadProgress;
+          final int count = state.data?.articles?.length ?? 0;
+          return ListView.separated(
+            itemCount: count + 1,
+            itemBuilder: (BuildContext context, int index) {
+              if (index == count) {
+                if (loading) {
+                  return const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Center(
+                      child: CircularProgressIndicator(),
                     ),
-                    if (state is WordLoadProgress)
-                      const Align(
-                        alignment: Alignment.topCenter,
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 16.0),
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+                  );
+                }
+                return const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text("powered by Connpass"),
+                  ),
+                );
+              } else if (index > count) {
+                return null;
+              }
+              return Provider<Article>.value(
+                value: state.data.articles[index],
+                child: const ArticleListTile(),
+              );
+            },
+            separatorBuilder: (BuildContext context, int index) {
+              return const Divider();
+            },
+          );
+        },
       ),
     );
   }
 }
 
-class WordView extends StatelessWidget {
-  const WordView();
+class ArticleListTile extends StatelessWidget {
+  const ArticleListTile();
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Word>(
-      builder: (BuildContext context, Word value, Widget _) {
-        debugPrint("WordView ${value?.word}");
-
-        final ThemeData theme = Theme.of(context);
-        final TextTheme textTheme = theme.textTheme;
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                value?.word ?? '',
-                style: textTheme.body1.copyWith(fontSize: 48.0),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            const SizedBox(width: 16.0),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                value?.pronunciation ?? '',
-                style: textTheme.caption.copyWith(fontSize: 24.0),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            const Divider(),
-            const SizedBox(height: 16.0),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                value?.japanese ?? '',
-                style: textTheme.body1.copyWith(fontSize: 48.0),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            Text(value?.explanation ?? ''),
-          ],
+    return Consumer<Article>(
+      builder: (BuildContext context, Article article, Widget child) {
+        return ListTile(
+          title: Text(article.title),
+          subtitle: Text(article.caption ?? ''),
+          trailing: const Icon(
+            Icons.arrow_forward_ios,
+            size: 14.0,
+          ),
+          onTap: () {
+            // ArticleDetailPage.push(context, article);
+          },
         );
       },
     );
