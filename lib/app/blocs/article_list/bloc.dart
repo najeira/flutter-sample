@@ -1,9 +1,4 @@
-import 'package:bloc/bloc.dart';
-import 'package:flutter/cupertino.dart';
-
-import 'package:flutter_sample/domain/domain.dart';
-
-import 'package:flutter_sample/helpers/get_it.dart';
+import '../imports.dart';
 
 import 'event.dart';
 import 'state.dart';
@@ -25,8 +20,8 @@ class ArticleListBloc extends Bloc<ArticleListEvent, ArticleListState> {
       try {
         final ArticleList next = await svc.articleList();
         yield ArticleListLoadSuccess(next);
-      } catch (ex) {
-        debugPrint(ex.toString());
+      } catch (ex, st) {
+        logger.errorException(ex, st);
 
         // 時間をおいてからリトライ
         await Future<void>.delayed(const Duration(seconds: 3));
@@ -35,7 +30,7 @@ class ArticleListBloc extends Bloc<ArticleListEvent, ArticleListState> {
 
     } else if (event is ArticleListNext) {
       if (state is! ArticleListLoadSuccess) {
-        debugPrint("ignore ${state.runtimeType}");
+        logger.info("ignore ${state.runtimeType}");
         return;
       }
 
@@ -56,8 +51,8 @@ class ArticleListBloc extends Bloc<ArticleListEvent, ArticleListState> {
           // 末尾まで読み込んだ
           yield ArticleListLoadFinish(state.data);
         }
-      } catch (ex) {
-        debugPrint(ex.toString());
+      } catch (ex, st) {
+        logger.errorException(ex, st);
         yield ArticleListLoadSuccess(state.data);
       }
     }

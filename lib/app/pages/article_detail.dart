@@ -9,7 +9,7 @@ import 'package:flutter_sample/app/helpers/datetime.dart';
 import 'package:flutter_sample/domain/domain.dart';
 
 class ArticleDetailPage extends StatelessWidget {
-  const ArticleDetailPage();
+  const ArticleDetailPage._();
 
   static Future<void> push(BuildContext context, Article article) {
     return Navigator.of(context).push(MaterialPageRoute<void>(
@@ -20,7 +20,7 @@ class ArticleDetailPage extends StatelessWidget {
   static Widget bloc(Article article) {
     return BlocProvider<ArticleDetailBloc>(
       create: (BuildContext context) => ArticleDetailBloc(article)..add(const ArticleDetailStart()),
-      child: const ArticleDetailPage(),
+      child: const ArticleDetailPage._(),
     );
   }
 

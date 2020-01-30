@@ -446,9 +446,9 @@ packages:
   store_builder:
     dependency: "direct main"
     description:
-      name: store_builder
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "../flutter-store-builder"
+      relative: true
+    source: path
     version: "0.3.1"
   stream_channel:
     dependency: transitive

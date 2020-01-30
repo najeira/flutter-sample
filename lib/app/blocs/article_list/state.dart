@@ -1,4 +1,4 @@
-import 'package:flutter_sample/domain/domain.dart';
+import '../imports.dart';
 
 abstract class ArticleListState {
   const ArticleListState(this.data);

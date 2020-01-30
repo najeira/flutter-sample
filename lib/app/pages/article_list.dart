@@ -1,28 +1,38 @@
-import 'package:flutter/material.dart';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:flutter_sample/app/blocs/blocs.dart';
-import 'package:flutter_sample/app/helpers/datetime.dart';
-
-import 'package:flutter_sample/domain/domain.dart';
+import './imports.dart';
 
 import 'article_detail.dart';
+import 'config/config.dart';
 
 class ArticleListPage extends StatelessWidget {
+  const ArticleListPage({
+    Key key,
+  }) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Flutter勉強会"),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => _onSettingsTap(context),
+          ),
+        ],
       ),
       body: ArticleListView.bloc(),
     );
   }
+
+  void _onSettingsTap(BuildContext context) {
+    ConfigPage.push(context);
+  }
 }
 
 class ArticleListView extends StatelessWidget {
-  const ArticleListView();
+  const ArticleListView({
+    Key key,
+  }) : super(key: key);
 
   static Widget bloc() {
     return BlocProvider<ArticleListBloc>(
@@ -35,7 +45,7 @@ class ArticleListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ArticleListBloc, ArticleListState>(
       builder: (BuildContext context, ArticleListState state) {
-        debugPrint("ArticleListView ${state?.data?.count}");
+        logger.info("ArticleListView ${state?.data?.count}");
         final bool loading = state is ArticleListLoadProgress || state is ArticleListInital;
         final bool hasNext = state is! ArticleListLoadFinish;
         final int count = state.data?.articles?.length ?? 0;

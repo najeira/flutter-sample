@@ -1,2 +1,2 @@
-export 'models/article.dart';
+export 'models/models.dart';
 export 'services/article.dart';
