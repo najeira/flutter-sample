@@ -1,4 +1,4 @@
-import '../imports.dart';
+import '../_imports.dart';
 
 class ConfigPage extends StatelessWidget {
   const ConfigPage._({

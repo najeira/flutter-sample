@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import '../imports.dart';
+import '../_imports.dart';
 
 import 'event.dart';
 import 'state.dart';
 
 class AppConfigBloc extends Bloc<AppConfigEvent, AppConfigState> {
   AppConfigBloc()
-      : _subject = getIt<Store>().use(0, seedValue: const AppConfig()),
+      : _subject = getIt<Store>().use(0, seedValue: const AppConfig.inital()),
         super() {
     _subscription = _subject.listen(_onData);
   }

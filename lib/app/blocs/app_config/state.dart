@@ -1,20 +1,4 @@
-// アプリの状態であり、ドメインモデルではないので
-// domain以下ではなくここに定義しておく
-class AppConfig {
-  const AppConfig({
-    this.darkTheme = false,
-  }) : assert(darkTheme != null);
-
-  final bool darkTheme;
-
-  AppConfig copyWith({
-    bool darkTheme,
-  }) {
-    return AppConfig(
-      darkTheme: darkTheme ?? this.darkTheme,
-    );
-  }
-}
+import '../_imports.dart';
 
 abstract class AppConfigState {
   const AppConfigState(this.data);

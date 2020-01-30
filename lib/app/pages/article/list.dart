@@ -1,6 +1,5 @@
-import '../imports.dart';
+import '../_imports.dart';
 
-// ignore: directives_ordering
 import '../config/config.dart';
 
 import 'detail.dart';

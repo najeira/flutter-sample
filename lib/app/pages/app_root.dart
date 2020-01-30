@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:flutter_sample/app/blocs/blocs.dart';
+import '_imports.dart';
 
 import 'article/list.dart';
 

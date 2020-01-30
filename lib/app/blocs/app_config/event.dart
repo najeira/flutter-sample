@@ -1,4 +1,4 @@
-import 'state.dart';
+import '../_imports.dart';
 
 abstract class AppConfigEvent {
   const AppConfigEvent();
