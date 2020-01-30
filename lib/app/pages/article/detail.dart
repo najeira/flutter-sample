@@ -34,6 +34,23 @@ class ArticleDetailPage extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: ArticleDetailView(),
       ),
+      floatingActionButton: BlocBuilder<ArticleDetailBloc, ArticleDetailState>(
+        builder: (BuildContext context, ArticleDetailState state) {
+          final ColorScheme colorScheme = Theme.of(context).colorScheme;
+          final bool favorite = state?.data?.favorite ?? false;
+          return FloatingActionButton(
+            backgroundColor: colorScheme.onBackground,
+            foregroundColor: favorite ? colorScheme.secondary : null,
+            child: Icon(
+              favorite ? Icons.favorite : Icons.favorite_border,
+            ),
+            onPressed: () {
+              final ArticleDetailBloc bloc = BlocProvider.of<ArticleDetailBloc>(context);
+              bloc.add(const ArticleDetailFavorite());
+            },
+          );
+        },
+      ),
     );
   }
 }

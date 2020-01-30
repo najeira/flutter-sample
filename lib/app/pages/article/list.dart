@@ -46,7 +46,7 @@ class ArticleListView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ArticleListBloc, ArticleListState>(
       builder: (BuildContext context, ArticleListState state) {
-        logger.info("ArticleListView ${state?.data?.count}");
+        //logger.info("ArticleListView ${state?.data?.count}");
         final bool loading = state is ArticleListLoadProgress || state is ArticleListInital;
         final bool hasNext = state is! ArticleListLoadFinish;
         final int count = state.data?.articles?.length ?? 0;
@@ -98,7 +98,7 @@ class ArticleListTile extends StatelessWidget {
     return BlocBuilder<ArticleDetailBloc, ArticleDetailState>(
       builder: (BuildContext context, ArticleDetailState state) {
         final Article article = state.data;
-        debugPrint("ArticleListTile ${article?.id}");
+        //logger.info("ArticleListTile ${article?.id}");
         return ListTile(
           title: Hero(
             tag: "article-title-${article.id}",
@@ -107,9 +107,15 @@ class ArticleListTile extends StatelessWidget {
             ),
           ),
           subtitle: Text(formatDateTime(article.startAt)),
-          trailing: Icon(
-            article.favorite ? Icons.favorite : Icons.favorite_border,
-            color: article.favorite ? accentColor : null,
+          trailing: IconButton(
+            icon: Icon(
+              article.favorite ? Icons.favorite : Icons.favorite_border,
+              color: article.favorite ? accentColor : null,
+            ),
+            onPressed: () {
+              final ArticleDetailBloc bloc = BlocProvider.of<ArticleDetailBloc>(context);
+              bloc.add(const ArticleDetailFavorite());
+            },
           ),
           onTap: () {
             ArticleDetailPage.push(context, article);

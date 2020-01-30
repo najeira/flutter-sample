@@ -32,7 +32,7 @@ class ConfigPage extends StatelessWidget {
             return Column(
               children: <Widget>[
                 SwitchListTile(
-                  title: const Text("ダーク・テーマ"),
+                  title: const Text("ダーク・モード"),
                   value: state.data.darkTheme,
                   onChanged: (bool value) {
                     final AppConfigBloc bloc = BlocProvider.of<AppConfigBloc>(context);
