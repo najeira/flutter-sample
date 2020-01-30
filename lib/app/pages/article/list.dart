@@ -1,7 +1,9 @@
-import './imports.dart';
+import '../imports.dart';
 
-import 'article_detail.dart';
-import 'config/config.dart';
+// ignore: directives_ordering
+import '../config/config.dart';
+
+import 'detail.dart';
 
 class ArticleListPage extends StatelessWidget {
   const ArticleListPage({

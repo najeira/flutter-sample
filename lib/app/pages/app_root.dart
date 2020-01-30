@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:flutter_sample/app/blocs/blocs.dart';
 
-import 'article_list.dart';
+import 'article/list.dart';
 
 // アプリの設定やグローバルな状態を扱う
 // このクラス自体はUIを持たない
