@@ -10,6 +10,6 @@ class AppConfigInitial extends AppConfigState {
   const AppConfigInitial(AppConfig data) : super(data);
 }
 
-class AppConfigLoadSuccess extends AppConfigState {
-  const AppConfigLoadSuccess(AppConfig data) : super(data);
+class AppConfigActive extends AppConfigState {
+  const AppConfigActive(AppConfig data) : super(data);
 }

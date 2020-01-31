@@ -14,14 +14,7 @@ import 'package:flutter_sample/infra/infra.dart';
 void main() {
   initializeDateFormatting("ja_JP");
 
-  GetIt.instance.registerSingleton(Store());
-
-  GetIt.instance.registerSingleton(const RemoteRepository(
-    "connpass.com",
-    "/api/v1/event/",
-  ));
-
-  GetIt.instance.registerSingleton(const ArticleService());
+  registerServices();
 
   FlutterError.onError = (FlutterErrorDetails error) {
     logger.error(error.exceptionAsString());
@@ -29,10 +22,20 @@ void main() {
 
   runZoned<Future<void>>(
     () async {
-      runApp(AppRoot.bloc());
+      runApp(MyApp.bloc());
     },
     onError: (Object ex, StackTrace st) {
       logger.errorException(ex, st);
     }
   );
+}
+
+void registerServices() {
+  GetIt.instance.registerSingleton<Store>(Store());
+  GetIt.instance.registerSingleton<RemoteRepository>(const RemoteRepository(
+    "connpass.com",
+    "/api/v1/event/",
+  ));
+  GetIt.instance.registerSingleton<AppConfigService>(const AppConfigService());
+  GetIt.instance.registerSingleton<ArticleService>(const ArticleService());
 }

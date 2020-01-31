@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:stack_trace/stack_trace.dart';
 
 class Logger {
-  bool printToConsole = false;
+  bool printToConsole = true;
 
   void info(String message) {
     final List<String> parts = Trace.current().frames[1].member.split(".");

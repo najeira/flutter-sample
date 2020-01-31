@@ -9,7 +9,7 @@ class AppConfig {
   ) : assert(darkTheme != null);
 
   const AppConfig.inital() : this(
-    true,
+    false,
   );
 
   factory AppConfig.fromJson(Map<String, dynamic> json) => _$AppConfigFromJson(json);
