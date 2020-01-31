@@ -32,6 +32,7 @@ void main() {
 
 void registerServices() {
   GetIt.instance.registerSingleton<Store>(Store());
+  GetIt.instance.registerSingleton<AppConfigRepository>(AppConfigRepository());
   GetIt.instance.registerSingleton<RemoteRepository>(const RemoteRepository(
     "connpass.com",
     "/api/v1/event/",

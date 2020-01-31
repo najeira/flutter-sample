@@ -33,6 +33,7 @@ class AppConfigBloc extends Bloc<AppConfigEvent, AppConfigState> {
 
     } else if (event is AppConfigUpdate) {
       yield AppConfigActive(event.data);
+      _save(_subject.value);
 
     } else if (event is AppConfigDarkThemeSet) {
       // subjectを更新すると_onDataが呼ばれてイベントが発生する
@@ -49,6 +50,11 @@ class AppConfigBloc extends Bloc<AppConfigEvent, AppConfigState> {
       );
 
     }
+  }
+
+  Future<void> _save(AppConfig data) {
+    final AppConfigService svc = getIt<AppConfigService>();
+    return svc.save(data);
   }
 
   void _onData(AppConfig data) {
