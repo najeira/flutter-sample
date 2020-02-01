@@ -1,4 +1,4 @@
-import '../_imports.dart';
+import '../../_imports.dart';
 
 abstract class ArticleDetailState {
   const ArticleDetailState(this.data);

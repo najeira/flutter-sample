@@ -1,1 +1,2 @@
-export 'article/remote_repository.dart';
+export 'app_config/repository.dart';
+export 'article/repository.dart';
