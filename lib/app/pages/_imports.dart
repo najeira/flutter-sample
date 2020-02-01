@@ -1,5 +1,6 @@
 export 'package:flutter/material.dart';
 
+export 'package:like_button/like_button.dart';
 export 'package:flutter_bloc/flutter_bloc.dart';
 
 export 'package:flutter_sample/app/blocs/blocs.dart';

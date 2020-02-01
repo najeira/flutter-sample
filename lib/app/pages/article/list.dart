@@ -94,23 +94,32 @@ class ArticleListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color accentColor = Theme.of(context).accentColor;
+    const double buttonSize = 28.0;
     return BlocBuilder<ArticleDetailBloc, ArticleDetailState>(
       builder: (BuildContext context, ArticleDetailState state) {
+        final ColorScheme colorScheme = Theme.of(context).colorScheme;
         final Article article = state.data;
         //logger.info("ArticleListTile ${article?.id}");
         return ListTile(
-          title: Hero(
-            tag: "article-title-${article.id}",
-            child: Material(
-              child: Text(article.title),
-            ),
-          ),
+          title: Text(article.title),
           subtitle: Text(formatDateTime(article.startAt)),
           trailing: IconButton(
-            icon: Icon(
-              article.favorite ? Icons.favorite : Icons.favorite_border,
-              color: article.favorite ? accentColor : null,
+            icon: LikeButton(
+              isLiked: state.data.favorite,
+              size: buttonSize,
+              bubblesColor: BubblesColor(
+                dotPrimaryColor: colorScheme.primary,
+                dotSecondaryColor: colorScheme.primaryVariant,
+                dotThirdColor: colorScheme.secondary,
+                dotLastColor: colorScheme.secondaryVariant,
+              ),
+              likeBuilder: (bool isLiked) {
+                return Icon(
+                  Icons.favorite,
+                  color: isLiked ? colorScheme.secondary : null,
+                  size: buttonSize,
+                );
+              },
             ),
             onPressed: () {
               final ArticleDetailBloc bloc = BlocProvider.of<ArticleDetailBloc>(context);

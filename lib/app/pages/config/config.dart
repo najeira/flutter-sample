@@ -13,9 +13,7 @@ class ConfigPage extends StatelessWidget {
 
   static Widget bloc() {
     return BlocProvider<AppConfigBloc>(
-      create: (BuildContext context) =>
-      AppConfigBloc()
-        ..add(const AppConfigStart()),
+      create: (BuildContext context) => AppConfigBloc(),
       child: const ConfigPage._(),
     );
   }

@@ -22,18 +22,13 @@ class AppConfigBloc extends Bloc<AppConfigEvent, AppConfigState> {
   @override
   Stream<AppConfigState> mapEventToState(AppConfigEvent event) async* {
     if (event is AppConfigStart) {
-      // 読み込みはすぐにおわってしまうが
-      // 分かりやすくするためすこし待たせる
-      await Future<void>.delayed(const Duration(seconds: 1));
-
       // 保存したAppConfigを読み込む
       final AppConfigService svc = getIt<AppConfigService>();
       final AppConfig data = await svc.load();
-      yield AppConfigActive(data);
+      _subject.value = data;
 
     } else if (event is AppConfigUpdate) {
       yield AppConfigActive(event.data);
-      _save(_subject.value);
 
     } else if (event is AppConfigDarkThemeSet) {
       // subjectを更新すると_onDataが呼ばれてイベントが発生する
@@ -41,6 +36,7 @@ class AppConfigBloc extends Bloc<AppConfigEvent, AppConfigState> {
       _subject.value = _subject.value.copyWith(
         darkTheme: true,
       );
+      _save(_subject.value);
 
     } else if (event is AppConfigLightThemeSet) {
       // subjectを更新すると_onDataが呼ばれてイベントが発生する
@@ -48,6 +44,7 @@ class AppConfigBloc extends Bloc<AppConfigEvent, AppConfigState> {
       _subject.value = _subject.value.copyWith(
         darkTheme: false,
       );
+      _save(_subject.value);
 
     }
   }
