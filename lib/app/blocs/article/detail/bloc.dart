@@ -5,44 +5,39 @@ import '../../_imports.dart';
 import 'event.dart';
 import 'state.dart';
 
-class ArticleDetailBloc extends Bloc<ArticleDetailEvent, ArticleDetailState> {
-  ArticleDetailBloc(Article article)
-      : _subject = getIt<Store>().use(article.id, seedValue: article),
-        super() {
-    _subscription = _subject.listen(_onData);
+class ArticleDetailHandler extends AppEventHandler<ArticleDetailEvent, ArticleDetailState> {
+  const ArticleDetailHandler({
+    Key key,
+    @required AppStateWidgetBuilder<ArticleDetailState> builder,
+    Widget child,
+  }) : super(
+          key: key,
+          builder: builder,
+          child: child,
+        );
+
+  @override
+  ArticleDetailState get initialState {
+    return const ArticleDetailInital();
   }
 
   @override
-  ArticleDetailState get initialState => ArticleDetailInital(_subject.value);
+  Stream<ArticleDetailState> onEvent(BuildContext context, ArticleDetailEvent event) async* {
+    final StoredSubject<Article> subject = subjectOf<Article>(context);
 
-  final StoredSubject<Article> _subject;
-
-  StreamSubscription<Article> _subscription;
-
-  @override
-  Stream<ArticleDetailState> mapEventToState(ArticleDetailEvent event) async* {
     if (event is ArticleDetailStart) {
       // このサンプルでは詳細のロードは必要ないが
       // 例としてダミーのdelayを入れておく
-      yield ArticleDetailLoadProgress(state.data);
+      yield const ArticleDetailLoading();
       await Future<void>.delayed(const Duration(seconds: 1));
-      yield ArticleDetailLoadSuccess(state.data);
-    } else if (event is ArticleDetailUpdate) {
-      yield ArticleDetailLoadSuccess(state.data);
+      subject.value = subject.value;
+      yield const ArticleDetailSuccess();
+
     } else if (event is ArticleDetailFavorite) {
-      state.data.favorite = !state.data.favorite;
-      _subject.value = state.data;
+      final Article article = subject.value;
+      article.favorite = !article.favorite;
+      subject.value = article;
+
     }
-  }
-
-  void _onData(Article data) {
-    add(ArticleDetailUpdate(data));
-  }
-
-  @override
-  Future<void> close() {
-    _subscription?.cancel();
-    _subject?.release();
-    return super.close();
   }
 }

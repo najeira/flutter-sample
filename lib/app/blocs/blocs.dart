@@ -1,6 +1,6 @@
-export 'app_config/bloc.dart';
-export 'app_config/event.dart';
-export 'app_config/state.dart';
+export 'config/bloc.dart';
+export 'config/event.dart';
+export 'config/state.dart';
 
 export 'article/detail/bloc.dart';
 export 'article/detail/event.dart';

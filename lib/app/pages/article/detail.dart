@@ -1,28 +1,44 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:flutter_sample/app/blocs/blocs.dart';
-import 'package:flutter_sample/app/helpers/datetime.dart';
-
-import 'package:flutter_sample/domain/domain.dart';
+import '../_imports.dart';
 
 class ArticleDetailPage extends StatelessWidget {
-  const ArticleDetailPage._();
+  const ArticleDetailPage._({
+    Key key,
+  }) : super(key: key);
 
   static Future<void> push(BuildContext context, Article article) {
     return Navigator.of(context).push(MaterialPageRoute<void>(
-      builder: (BuildContext context) => ArticleDetailPage.bloc(article),
+      builder: (BuildContext context) {
+        // 対象Articleのidと関連付けておく
+        return Provider<int>.value(
+          value: article.id,
+          child: const ArticleDetailPage._(),
+        );
+      },
     ));
   }
 
-  static Widget bloc(Article article) {
-    return BlocProvider<ArticleDetailBloc>(
-      create: (BuildContext context) => ArticleDetailBloc(article)..add(const ArticleDetailStart()),
-      child: const ArticleDetailPage._(),
+  @override
+  Widget build(BuildContext context) {
+    return const ArticleDetailHandler(
+      builder: _buildWithState,
+      child: ArticleDetailScaffold(),
     );
   }
+
+  static Widget _buildWithState(BuildContext context, ArticleDetailState state, Widget child) {
+    return Stack(
+      children: <Widget>[
+        child,
+        if (state is ArticleDetailLoading) const CircularProgressIndicator(),
+      ],
+    );
+  }
+}
+
+class ArticleDetailScaffold extends StatelessWidget {
+  const ArticleDetailScaffold({
+    Key key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -34,71 +50,94 @@ class ArticleDetailPage extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: ArticleDetailView(),
       ),
-      floatingActionButton: BlocBuilder<ArticleDetailBloc, ArticleDetailState>(
-        builder: (BuildContext context, ArticleDetailState state) {
-          final ColorScheme colorScheme = Theme.of(context).colorScheme;
-          final bool favorite = state?.data?.favorite ?? false;
-          return FloatingActionButton(
-            backgroundColor: colorScheme.onBackground,
-            foregroundColor: favorite ? colorScheme.secondary : null,
-            child: Icon(
-              favorite ? Icons.favorite : Icons.favorite_border,
-            ),
-            onPressed: () {
-              final ArticleDetailBloc bloc = BlocProvider.of<ArticleDetailBloc>(context);
-              bloc.add(const ArticleDetailFavorite());
-            },
-          );
-        },
+      floatingActionButton: SubjectProvider<Article>(
+        id: Provider.of<int>(context, listen: true),
+        child: ProxyProvider<Article, bool>(
+          create: (BuildContext context) => false,
+          update: (BuildContext context, Article article, bool previous) => article.favorite,
+          child: const ArticleDetailFavoriteButton(),
+        ),
       ),
     );
   }
 }
 
-class ArticleDetailView extends StatelessWidget {
-  const ArticleDetailView();
+class ArticleDetailFavoriteButton extends StatelessWidget {
+  const ArticleDetailFavoriteButton({
+    Key key,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    return BlocBuilder<ArticleDetailBloc, ArticleDetailState>(
-      builder: (BuildContext context, ArticleDetailState state) {
-        final Article article = state.data;
-        debugPrint("ArticleDetailView ${article?.id}");
-        return ListView(
-          children: <Widget>[
-            Hero(
-              tag: "article-title-${article.id}",
-              child: Material(
-                child: Text(
-                  article.title,
-                  style: theme.textTheme.headline,
-                ),
-              ),
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              article.caption,
-              style: theme.textTheme.body1,
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              formatDateTime(article.startAt),
-              style: theme.textTheme.body1,
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              article.place,
-              style: theme.textTheme.body1,
-            ),
-            const SizedBox(height: 8.0),
-            Text(
-              article.address,
-              style: theme.textTheme.body1,
-            ),
-          ],
+    return Consumer<bool>(
+      builder: (BuildContext context, bool favorite, Widget child) {
+        final ColorScheme colorScheme = Theme.of(context).colorScheme;
+        return FloatingActionButton(
+          backgroundColor: colorScheme.onBackground,
+          foregroundColor: favorite ? colorScheme.secondary : null,
+          child: Icon(
+            favorite ? Icons.favorite : Icons.favorite_border,
+          ),
+          onPressed: () {
+            const ArticleDetailFavorite().dispatch(context);
+          },
         );
       },
+    );
+  }
+}
+
+class ArticleDetailView extends StatelessWidget {
+  const ArticleDetailView({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SubjectBuilder<Article>(
+      id: Provider.of<int>(context, listen: true),
+      builder: _buildWithSubject,
+    );
+  }
+
+  static Widget _buildWithSubject(BuildContext context, StoredSubject<Article> subject, Widget child) {
+    final Article article = subject.value;
+    debugPrint("ArticleDetailView ${article?.id}");
+
+    final ThemeData theme = Theme.of(context);
+
+    return ListView(
+      children: <Widget>[
+        Hero(
+          tag: "article-title-${article.id}",
+          child: Material(
+            child: Text(
+              article.title,
+              style: theme.textTheme.headline5,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8.0),
+        Text(
+          article.caption,
+          style: theme.textTheme.bodyText2,
+        ),
+        const SizedBox(height: 8.0),
+        Text(
+          formatDateTime(article.startAt),
+          style: theme.textTheme.bodyText2,
+        ),
+        const SizedBox(height: 8.0),
+        Text(
+          article.place,
+          style: theme.textTheme.bodyText2,
+        ),
+        const SizedBox(height: 8.0),
+        Text(
+          article.address,
+          style: theme.textTheme.bodyText2,
+        ),
+      ],
     );
   }
 }

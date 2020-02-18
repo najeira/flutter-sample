@@ -1,23 +1,19 @@
-import '../../_imports.dart';
-
 abstract class ArticleListState {
-  const ArticleListState(this.data);
-
-  final ArticleList data;
+  const ArticleListState();
 }
 
 class ArticleListInital extends ArticleListState {
-  const ArticleListInital() : super(null);
+  const ArticleListInital();
 }
 
-class ArticleListLoadProgress extends ArticleListState {
-  const ArticleListLoadProgress(ArticleList data) : super(data);
+class ArticleListLoading extends ArticleListState {
+  const ArticleListLoading();
 }
 
-class ArticleListLoadSuccess extends ArticleListState {
-  const ArticleListLoadSuccess(ArticleList data) : super(data);
+class ArticleListSuccess extends ArticleListState {
+  const ArticleListSuccess();
 }
 
-class ArticleListLoadFinish extends ArticleListState {
-  const ArticleListLoadFinish(ArticleList data) : super(data);
+class ArticleListFinish extends ArticleListState {
+  const ArticleListFinish();
 }

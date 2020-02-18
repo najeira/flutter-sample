@@ -5,7 +5,7 @@ import 'article/list.dart';
 // アプリの設定やグローバルな状態を扱う
 // このクラス自体はUIを持たない
 class MyApp extends StatelessWidget {
-  const MyApp._({
+  const MyApp({
     Key key,
   }) : super(key: key);
 
@@ -17,37 +17,37 @@ class MyApp extends StatelessWidget {
     },
   );
 
-  static Widget bloc() {
-    return BlocProvider<AppConfigBloc>(
-      create: (BuildContext context) => AppConfigBloc()..add(const AppConfigStart()),
-      child: const MyApp._(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AppConfigBloc, AppConfigState>(
-      builder: (BuildContext context, AppConfigState state) {
-        return _build(context, state);
-      },
+    return const SubjectBuilder<Config>(
+      id: kConfigID,
+      builder: _buildWithSubject,
+      child: ConfigHandler(
+        builder: _buildWithState,
+      ),
     );
   }
 
-  Widget _build(BuildContext context, AppConfigState state) {
-    final AppConfig config = state.data;
+  static Widget _buildWithSubject(BuildContext context, StoredSubject<Config> subject, Widget child) {
+    final Config config = subject.value ?? const Config.inital();
     final ThemeData theme = ThemeData.from(
       colorScheme: config.darkTheme ? const ColorScheme.dark() : const ColorScheme.light(),
     );
-
-    final bool initial = state is AppConfigInitial;
-    final StatelessWidget child = initial ? const StartPage() : const ArticleListPage();
 
     return MaterialApp(
       theme: theme.copyWith(
         pageTransitionsTheme: _pageTransitionsTheme,
       ),
-      home: child,
+      home: ListenableProvider<StoredSubject<Config>>.value(
+        value: subject,
+        child: child,
+      ),
     );
+  }
+
+  static Widget _buildWithState(BuildContext context, ConfigState state, Widget child) {
+    final bool initial = state is ConfigInitial;
+    return initial ? const StartPage() : const ArticleListPage();
   }
 }
 

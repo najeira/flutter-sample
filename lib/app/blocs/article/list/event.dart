@@ -1,4 +1,6 @@
-abstract class ArticleListEvent {
+import '../../_imports.dart';
+
+abstract class ArticleListEvent extends AppEvent {
   const ArticleListEvent();
 }
 

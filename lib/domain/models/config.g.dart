@@ -1,17 +1,17 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'app_config.dart';
+part of 'config.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-AppConfig _$AppConfigFromJson(Map<String, dynamic> json) {
-  return AppConfig(
+Config _$ConfigFromJson(Map<String, dynamic> json) {
+  return Config(
     json['darkTheme'] as bool ?? false,
   );
 }
 
-Map<String, dynamic> _$AppConfigToJson(AppConfig instance) => <String, dynamic>{
+Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
       'darkTheme': instance.darkTheme,
     };

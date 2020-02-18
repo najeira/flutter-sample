@@ -1,2 +1,2 @@
-export 'app_config.dart';
 export 'article.dart';
+export 'config.dart';
