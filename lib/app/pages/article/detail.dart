@@ -9,6 +9,7 @@ import 'package:flutter_sample/app/helpers/datetime.dart';
 import 'package:flutter_sample/app/helpers/enum.dart';
 import 'package:flutter_sample/app/helpers/provider.dart';
 import 'package:flutter_sample/domain/models/models.dart';
+import 'package:flutter_sample/helpers/logger.dart';
 
 class ArticleDetailPage extends StatelessWidget {
   const ArticleDetailPage._({
@@ -18,9 +19,10 @@ class ArticleDetailPage extends StatelessWidget {
   static Future<void> push(BuildContext context, Article article) {
     return Navigator.of(context).push(MaterialPageRoute<void>(
       builder: (BuildContext context) {
-        // 対象Articleのidと関連付けておく
-        return Provider<int>.value(
-          value: article.id,
+        // 対象Articleと関連付けておく
+        return SubjectProvider<Article>(
+          initalValue: article,
+          id: article.id,
           child: const ArticleDetailPage._(),
         );
       },
@@ -60,13 +62,10 @@ class ArticleDetailScaffold extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: ArticleDetailView(),
       ),
-      floatingActionButton: SubjectProvider<Article>(
-        id: Provider.of<int>(context, listen: true),
-        child: ProxyProvider<Article, bool>(
-          create: (BuildContext context) => false,
-          update: (BuildContext context, Article article, bool previous) => article.favorite,
-          child: const ArticleDetailFavoriteButton(),
-        ),
+      floatingActionButton: ProxyProvider<Article, bool>(
+        create: (BuildContext context) => false,
+        update: (BuildContext context, Article article, bool previous) => article.favorite,
+        child: const ArticleDetailFavoriteButton(),
       ),
     );
   }
@@ -83,8 +82,8 @@ class ArticleDetailFavoriteButton extends StatelessWidget {
       builder: (BuildContext context, bool favorite, Widget child) {
         final ColorScheme colorScheme = Theme.of(context).colorScheme;
         return FloatingActionButton(
-          backgroundColor: colorScheme.onBackground,
-          foregroundColor: favorite ? colorScheme.secondary : null,
+          backgroundColor: colorScheme.primary,
+          foregroundColor: favorite ? colorScheme.secondary : colorScheme.onPrimary,
           child: Icon(
             favorite ? Icons.favorite : Icons.favorite_border,
           ),
@@ -104,28 +103,17 @@ class ArticleDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SubjectBuilder<Article>(
-      id: Provider.of<int>(context, listen: true),
-      builder: _buildWithSubject,
-    );
-  }
+    final Article article = valueOf(context, listen: true);
 
-  static Widget _buildWithSubject(BuildContext context, StoredSubject<Article> subject, Widget child) {
-    final Article article = subject.value;
-    debugPrint("ArticleDetailView ${article?.id}");
+    logger.info("${runtimeType}(${identityHashCode(this)}) ${article?.id}");
 
     final ThemeData theme = Theme.of(context);
 
     return ListView(
       children: <Widget>[
-        Hero(
-          tag: "article-title-${article.id}",
-          child: Material(
-            child: Text(
-              article.title,
-              style: theme.textTheme.headline5,
-            ),
-          ),
+        Text(
+          article.title,
+          style: theme.textTheme.headline5,
         ),
         const SizedBox(height: 8.0),
         Text(

@@ -9,6 +9,7 @@ import 'package:flutter_sample/app/helpers/datetime.dart';
 import 'package:flutter_sample/app/helpers/enum.dart';
 import 'package:flutter_sample/app/helpers/provider.dart';
 import 'package:flutter_sample/domain/models/models.dart';
+import 'package:flutter_sample/helpers/logger.dart';
 
 import '../config/config.dart';
 
@@ -52,16 +53,13 @@ class ArticleListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SubjectProvider<ArticleList>(
-      id: kArticleListID,
-      child: Consumer<ArticleList>(
-        builder: _buildWithValue,
-      ),
+    return Consumer<ArticleList>(
+      builder: _buildWithValue,
     );
   }
 
   static Widget _buildWithValue(BuildContext context, ArticleList articleList, Widget child) {
-    //logger.info("ArticleListView ${state?.data?.count}");
+    logger.info("ArticleListView ${articleList?.count}");
 
     final ArticleListState state = Provider.of<ArticleListState>(context, listen: true);
     final bool loading = state is ArticleListLoading || state is ArticleListInital;
@@ -89,52 +87,16 @@ class ArticleListView extends StatelessWidget {
           return null;
         }
 
-        return Provider<Article>.value(
-          value: articleList.articles[index],
-          child: const ArticleWithStoredSubject(
-            child: ArticleListTile(),
-          ),
+        final Article article = articleList.articles[index];
+        return SubjectProvider<Article>(
+          initalValue: article,
+          id: article.id,
+          child: const ArticleListTile(),
         );
       },
       separatorBuilder: (BuildContext context, int index) {
         return const Divider();
       },
-    );
-  }
-}
-
-class ArticleWithStoredSubject extends StatelessWidget {
-  const ArticleWithStoredSubject({
-    Key key,
-    this.child,
-  }) : super(key: key);
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    final Article article = Provider.of<Article>(context, listen: true);
-
-    final StoredSubject<Article> Function(BuildContext context) create = (BuildContext context) {
-      return StoreProvider.of(context).use<Article>(article.id, seedValue: article);
-    };
-
-    // 個別のArticleはStoreに入っていないので
-    // ここでuseして子孫で使えるようにする
-    return InheritedProvider<StoredSubject<Article>>(
-      create: (BuildContext context) {
-        return create(context);
-      },
-      update: (BuildContext context, StoredSubject<Article> previous) {
-        if (article.id == previous.id) {
-          return previous;
-        }
-        return create(context);
-      },
-      dispose: (BuildContext context, StoredSubject<Article> subject) {
-        subject.release();
-      },
-      child: child,
     );
   }
 }
@@ -146,20 +108,18 @@ class ArticleListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Article>(
-      builder: _buildWithValue,
+    return ArticleDetailHandler(
+      child: Consumer<Article>(
+        builder: _buildWithValue,
+      ),
     );
   }
 
-  static Widget _buildWithValue(BuildContext context, Article article, Widget child) {
-    //debugPrint("ArticleListTile ${article?.id}");
+  Widget _buildWithValue(BuildContext context, Article article, Widget child) {
+    logger.info("${runtimeType}(${identityHashCode(this)}) ${article?.id}");
+
     return ListTile(
-      title: Hero(
-        tag: "article-title-${article.id}",
-        child: Material(
-          child: Text(article.title),
-        ),
-      ),
+      title: Text(article.title),
       subtitle: Text(formatDateTime(article.startAt)),
       trailing: ProxyProvider<Article, bool>(
         create: (BuildContext context) => article.favorite,
@@ -167,6 +127,7 @@ class ArticleListTile extends StatelessWidget {
         child: const ArticleListFavoriteButton(),
       ),
       onTap: () {
+        // ここもイベントにするべきだろうか？
         ArticleDetailPage.push(context, article);
       },
     );
@@ -188,7 +149,9 @@ class ArticleListFavoriteButton extends StatelessWidget {
             favorite ? Icons.favorite : Icons.favorite_border,
             color: favorite ? accentColor : null,
           ),
-          onPressed: () {},
+          onPressed: () {
+            const ArticleDetailFavorite().dispatch(context);
+          },
         );
       },
     );

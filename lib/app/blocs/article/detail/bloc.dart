@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_sample/helpers/logger.dart';
 
 import 'package:notification_handler/notification_handler.dart';
 import 'package:provider/single_child_widget.dart';
@@ -15,9 +16,10 @@ import 'state.dart';
 class ArticleDetailHandler extends SingleChildStatelessWidget {
   const ArticleDetailHandler({
     Key key,
-    @required this.builder,
+    this.builder,
     Widget child,
-  }) : super(
+  })  : assert(builder != null || child != null),
+        super(
           key: key,
           child: child,
         );
@@ -36,7 +38,9 @@ class ArticleDetailHandler extends SingleChildStatelessWidget {
   }
 
   Stream<ArticleDetailState> onEvent(BuildContext context, ArticleDetailEvent event) async* {
-    final StoredSubject<Article> subject = subjectOf<Article>(context);
+    logger.info("${runtimeType} ${event}");
+
+    final StoredSubject<Article> subject = subjectOf<Article>(context, listen: false);
 
     if (event is ArticleDetailStart) {
       // このサンプルでは詳細のロードは必要ないが
