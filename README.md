@@ -87,7 +87,66 @@ infraの各モジュールを利用し、リモートやローカルやデバイ
 
 # 実装例
 
-## Bloc
+## 状態管理
+
+ValueNotifier, ChangeNotifier と
+ValueListenableProvider, ChangeNotifierProvider を使う方法がある。
+
+```dart
+ValueListenableProvider<int>(
+  create: (BuildContext context) => ValueNotifier<int>(0),
+  child: const YourCounterWidget(),
+);
+```
+
+使う側は Provider.of もしくは Consumer で値を得る。
+
+```dart
+Consumer<int>(
+  builder: (BuildContext context, int value, Widget child) {
+    return Text('count is ${value}');
+  },
+);
+```
+
+ValueNotifier や ChangeNotifier があちこちで必要になり、
+それらを一元的に管理したい場合は store_builder ライブラリを使うこともできる。
+
+```dart
+SubjectProvider<int>(
+  initialValue: (BuildContext context) => 0,
+  id: 'my counter',
+  child: const YourCounterWidget(),
+);
+```
+
+※consumeするほうは同じ
+
+## イベントハンドリング
+
+Flutter には Notification というクラスがあり、
+Widget ツリーをさかのぼってイベントを伝えることができる。
+
+※プッシュ通知のことではなく、Flutter内の仕組み
+
+例えば、スクロールできる Widget でスクロールすると
+ScrollNotification が発行されており、
+RefreshIndicator はこれを利用して実装されている。
+
+ボタンなどで Notification を発行し、
+NotificationListener で処理を行う。
+
+```dart
+NotificationListener<SomeNotification>(
+  onNotification: (SomeNotification notification) {
+    if (notification is SomeNotification) {
+      // イベントに応じた処理
+    }
+    return true;
+  },
+  child: const YourChildWidget(),
+);
+```
 
 `notification_handler` ライブラリを使う。
 
@@ -112,9 +171,3 @@ NotificationHandler<ArticleEvent, ArticleState>(
   child: child,
 );
 ```
-
-## その他
-
-pages, widgets はだいたい変わらないし、 models, services, infra あたりは、アプリによるし、とくに例示なし。
-
-# まとめ
