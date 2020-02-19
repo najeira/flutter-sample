@@ -36,13 +36,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.0"
-  bloc:
-    dependency: "direct main"
-    description:
-      name: bloc
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -174,13 +167,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_bloc:
-    dependency: "direct main"
-    description:
-      name: flutter_bloc
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.1.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -291,6 +277,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.2.5"
+  like_button:
+    dependency: "direct main"
+    description:
+      name: like_button
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0"
   logging:
     dependency: transitive
     description:
@@ -306,7 +299,7 @@ packages:
     source: hosted
     version: "0.12.6"
   meta:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: meta
       url: "https://pub.dartlang.org"
@@ -340,6 +333,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1+2"
+  notification_handler:
+    dependency: "direct main"
+    description:
+      path: "../flutter-notification-handler"
+      relative: true
+    source: path
+    version: "0.0.1"
   package_config:
     dependency: transitive
     description:
@@ -409,7 +409,7 @@ packages:
       name: provider
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.2"
+    version: "4.0.4"
   pub_semver:
     dependency: transitive
     description:
@@ -484,7 +484,7 @@ packages:
       path: "../flutter-store-builder"
       relative: true
     source: path
-    version: "0.3.2"
+    version: "0.4.0"
   stream_channel:
     dependency: transitive
     description:

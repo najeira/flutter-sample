@@ -1,4 +1,6 @@
-abstract class ArticleListEvent {
+import 'package:flutter/material.dart';
+
+abstract class ArticleListEvent extends Notification {
   const ArticleListEvent();
 }
 

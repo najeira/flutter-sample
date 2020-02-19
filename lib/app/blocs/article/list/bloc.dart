@@ -1,59 +1,87 @@
-import '../../_imports.dart';
+import 'package:flutter/material.dart';
+
+import 'package:notification_handler/notification_handler.dart';
+import 'package:provider/single_child_widget.dart';
+import 'package:store_builder/store_builder.dart';
+
+import 'package:flutter_sample/app/helpers/provider.dart';
+import 'package:flutter_sample/domain/domain.dart';
+import 'package:flutter_sample/helpers/get_it.dart';
+import 'package:flutter_sample/helpers/logger.dart';
 
 import 'event.dart';
 import 'state.dart';
 
-class ArticleListBloc extends Bloc<ArticleListEvent, ArticleListState> {
-  ArticleListBloc()
-      : initialState = const ArticleListInital(),
-        super();
+class ArticleListHandler extends SingleChildStatelessWidget {
+  const ArticleListHandler({
+    Key key,
+    this.builder,
+    Widget child,
+  })  : assert(builder != null || child != null),
+        super(
+          key: key,
+          child: child,
+        );
+
+  final NotificationHandlerWidgetBuilder<ArticleListState> builder;
 
   @override
-  final ArticleListState initialState;
+  Widget buildWithChild(BuildContext context, Widget child) {
+    return NotificationHandler<ArticleListEvent, ArticleListState>(
+      initialState: const ArticleListInital(),
+      onInit: onInit,
+      onEvent: onEvent,
+      builder: builder,
+      child: child,
+    );
+  }
 
-  @override
-  Stream<ArticleListState> mapEventToState(ArticleListEvent event) async* {
+  void onInit(BuildContext context) {
+    final StoredSubject<ArticleList> subject = subjectOf<ArticleList>(context);
+    if (!subject.hasValue) {
+      const ArticleListStart().dispatch(context);
+    }
+  }
+
+  Stream<ArticleListState> onEvent(BuildContext context, ArticleListEvent event) async* {
+    final StoredSubject<ArticleList> subject = subjectOf<ArticleList>(context, listen: false);
+    final ArticleList current = subject.value;
+
     if (event is ArticleListStart) {
-      yield ArticleListLoadProgress(state.data);
+      yield const ArticleListLoading();
 
       final ArticleService svc = getIt<ArticleService>();
       try {
-        final ArticleList next = await svc.articleList();
-        yield ArticleListLoadSuccess(next);
+        subject.value = await svc.articleList();
+        yield const ArticleListSuccess();
       } catch (ex, st) {
         logger.errorException(ex, st);
 
         // 時間をおいてからリトライ
         await Future<void>.delayed(const Duration(seconds: 3));
-        add(const ArticleListStart());
+        event.dispatch(context);
       }
-
     } else if (event is ArticleListNext) {
-      if (state is! ArticleListLoadSuccess) {
-        logger.info("ignore ${state.runtimeType}");
-        return;
-      }
-
-      yield ArticleListLoadProgress(state.data);
+      yield const ArticleListLoading();
 
       final ArticleService svc = getIt<ArticleService>();
       try {
-        final ArticleList next = await svc.articleList(state.data);
+        final ArticleList next = await svc.articleList(current);
         if (next != null) {
-          final ArticleList combine = ArticleList(
-            state.data.start,
-            state.data.count + next.count,
+          subject.value = ArticleList(
+            current.start,
+            current.count + next.count,
             next.total,
-            state.data.articles..addAll(next.articles),
+            current.articles..addAll(next.articles),
           );
-          yield ArticleListLoadSuccess(combine);
+          yield const ArticleListSuccess();
         } else {
           // 末尾まで読み込んだ
-          yield ArticleListLoadFinish(state.data);
+          yield const ArticleListFinish();
         }
       } catch (ex, st) {
         logger.errorException(ex, st);
-        yield ArticleListLoadSuccess(state.data);
+        yield const ArticleListSuccess();
       }
     }
   }
