@@ -23,7 +23,7 @@ void main() {
   runZoned<Future<void>>(() async {
     runApp(StoreProvider(
       store: Store(),
-      child: MyApp(),
+      child: const MyApp(),
     ));
   }, onError: (Object ex, StackTrace st) {
     logger.errorException(ex, st);

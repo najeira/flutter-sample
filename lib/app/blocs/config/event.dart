@@ -1,6 +1,6 @@
-import '../_imports.dart';
+import 'package:flutter/material.dart';
 
-abstract class ConfigEvent extends AppEvent {
+abstract class ConfigEvent extends Notification {
   const ConfigEvent();
 }
 

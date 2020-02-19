@@ -20,6 +20,8 @@ dependencies:
   like_button: ^0.2.0
   store_builder:
     path: ../flutter-store-builder
+  notification_handler:
+    path: ../flutter-notification-handler
 
 dev_dependencies:
   flutter_test:

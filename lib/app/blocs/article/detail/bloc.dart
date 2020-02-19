@@ -1,27 +1,40 @@
 import 'dart:async';
 
-import '../../_imports.dart';
+import 'package:flutter/material.dart';
+
+import 'package:notification_handler/notification_handler.dart';
+import 'package:provider/single_child_widget.dart';
+import 'package:store_builder/store_builder.dart';
+
+import 'package:flutter_sample/app/helpers/provider.dart';
+import 'package:flutter_sample/domain/domain.dart';
 
 import 'event.dart';
 import 'state.dart';
 
-class ArticleDetailHandler extends AppEventHandler<ArticleDetailEvent, ArticleDetailState> {
+class ArticleDetailHandler extends SingleChildStatelessWidget {
   const ArticleDetailHandler({
     Key key,
-    @required AppStateWidgetBuilder<ArticleDetailState> builder,
+    @required this.builder,
     Widget child,
   }) : super(
           key: key,
-          builder: builder,
           child: child,
         );
 
-  @override
-  ArticleDetailState get initialState {
-    return const ArticleDetailInital();
-  }
+  final NotificationHandlerWidgetBuilder<ArticleDetailState> builder;
 
   @override
+  Widget buildWithChild(BuildContext context, Widget child) {
+    return NotificationHandler<ArticleDetailEvent, ArticleDetailState>(
+      initialState: const ArticleDetailInital(),
+      onInit: null,
+      onEvent: onEvent,
+      builder: builder,
+      child: child,
+    );
+  }
+
   Stream<ArticleDetailState> onEvent(BuildContext context, ArticleDetailEvent event) async* {
     final StoredSubject<Article> subject = subjectOf<Article>(context);
 

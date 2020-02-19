@@ -1,4 +1,13 @@
-import '../_imports.dart';
+import 'package:flutter/material.dart';
+
+import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
+import 'package:store_builder/store_builder.dart';
+
+import 'package:flutter_sample/app/blocs/blocs.dart';
+import 'package:flutter_sample/app/helpers/datetime.dart';
+import 'package:flutter_sample/app/helpers/enum.dart';
+import 'package:flutter_sample/domain/models/models.dart';
 
 class ConfigPage extends StatelessWidget {
   const ConfigPage._({

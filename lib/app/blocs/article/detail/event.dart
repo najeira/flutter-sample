@@ -1,6 +1,6 @@
-import '../../_imports.dart';
+import 'package:flutter/material.dart';
 
-abstract class ArticleDetailEvent extends AppEvent {
+abstract class ArticleDetailEvent extends Notification {
   const ArticleDetailEvent();
 }
 
