@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
+import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:store_builder/store_builder.dart';
 
@@ -8,6 +8,7 @@ import 'package:flutter_sample/app/blocs/blocs.dart';
 import 'package:flutter_sample/app/helpers/enum.dart';
 import 'package:flutter_sample/app/helpers/provider.dart';
 import 'package:flutter_sample/domain/models/models.dart';
+import 'package:flutter_sample/helpers/logger.dart';
 
 import 'article/list.dart';
 

@@ -9,6 +9,7 @@ import 'package:store_builder/store_builder.dart';
 import 'package:flutter_sample/app/helpers/provider.dart';
 import 'package:flutter_sample/domain/domain.dart';
 import 'package:flutter_sample/helpers/get_it.dart';
+import 'package:flutter_sample/helpers/logger.dart';
 
 import 'event.dart';
 import 'state.dart';
@@ -71,7 +72,9 @@ class ConfigHandler extends SingleChildStatelessWidget {
 
       yield const ConfigSuccess();
     } else if (event is ConfigThemeChange) {
-      _updateDarkTheme(subject, !subject.value.darkTheme);
+      yield* _updateDarkTheme(subject, !subject.value.darkTheme);
+    } else if (event is ConfigPageTransitonChange) {
+      yield* _updateAndroidPageTransition(subject, !subject.value.androidPageTransition);
     }
   }
 
@@ -81,10 +84,26 @@ class ConfigHandler extends SingleChildStatelessWidget {
     // 分かりやすくするためすこし待たせる
     await Future<void>.delayed(const Duration(seconds: 1));
 
-    _updateSubjectAndSave(
+    await _updateSubjectAndSave(
       subject,
       subject.value.copyWith(
         darkTheme: darkTheme,
+      ),
+    );
+
+    yield const ConfigSuccess();
+  }
+
+  Stream<ConfigState> _updateAndroidPageTransition(StoredSubject<Config> subject, bool androidPageTransition) async* {
+    yield const ConfigLoading();
+
+    // 分かりやすくするためすこし待たせる
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    await _updateSubjectAndSave(
+      subject,
+      subject.value.copyWith(
+        androidPageTransition: androidPageTransition,
       ),
     );
 
