@@ -8,5 +8,5 @@ StoredSubject<T> subjectOf<T>(BuildContext context, {bool listen = true}) {
 }
 
 T valueOf<T>(BuildContext context, {bool listen = true}) {
-  return subjectOf<T>(context, listen: listen)?.value;
+  return Provider.of<T>(context, listen: listen);
 }

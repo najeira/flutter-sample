@@ -7,7 +7,7 @@ Flutterでアプリを作るアーキテクチャの一例
 - app
   - pages
   - widgets
-  - blocs
+  - handlers
   - helpers
 - domain
   - models
@@ -28,24 +28,29 @@ pagesは画面、widgetsはパーツやコンポーネントを置く。
 Flutterでは画面とパーツに大きな違いはないが、
 人間の認識では違うものなので、なんとなく分けておく。
 
-依存: blocsとhelpersに依存する。domainやinfraを直接使うことはない。
+依存: handlersとhelpersに依存する。domainやinfraを直接使うことはない。
 
-### blocs
+### handlers
 
 UIからの入力を受け付ける。
 
-Widgetではなく、アプリケーションのロジックを書く場所。
+アプリケーションのロジックを書く場所。
+アプリ/UIに近いロジックを書き、
+domain/servicesにあるドメインロジックを使う。
 
 イベント `Notification` が通知されてくるので、
-必要に応じてServiceに処理をさせる。
-状態とイベントを合成することで、Serviceへの入力になる。
+必要に応じてserviceに処理をさせる。
+状態とイベントを合成することでserviceへの入力になる。
 
 状態は持たず、Providerによって親から提供された状態を得る。
 
-画面やコンポーネントに対応した、小さいBlocがたくさんある。
-Serviceよりも細かい単位で区切られる（ことが多いと思われる）。
+このため、Widget treeのことは知っている。
+UIを構築はしないがWidgetやFlutterには依存している。
 
-例: NoteShowBloc, NoteEditBloc <-> NoteService
+画面やコンポーネントに対応した、小さいhandlerがたくさんある。
+serviceよりも細かい単位で区切られる（ことが多いと思われる）。
+
+例: NoteShowHandler, NoteEditHandler <-> NoteService
 
 依存: domain/services に依存する。infraを直接使うことはない。
 
@@ -89,8 +94,11 @@ infraの各モジュールを利用し、リモートやローカルやデバイ
 
 ## 状態管理
 
+### ValueNotifier, ChangeNotifier
+
+このサンプルアプリの状態管理について知る前に、その前段として
 ValueNotifier, ChangeNotifier と
-ValueListenableProvider, ChangeNotifierProvider を使う方法がある。
+ValueListenableProvider, ChangeNotifierProvider を使う方法について。
 
 ```dart
 ValueListenableProvider<int>(
@@ -109,8 +117,20 @@ Consumer<int>(
 );
 ```
 
-ValueNotifier や ChangeNotifier があちこちで必要になり、
-それらを一元的に管理したい場合は store_builder ライブラリを使うこともできる。
+```dart
+final int value = Provider.of<int>(context, listen: true);
+return Text('count is ${value}');
+```
+
+### SubjectProvider
+
+本アプリでも、構造や内部の仕組みは、ValueNotifier, ChangeNotifier
+と似たようなことを行っている。
+
+ただし、別の箇所にあるWidgetが、同じ状態を参照するために、
+store_builder というライブラリを使っている。
+
+
 
 ```dart
 SubjectProvider<int>(
@@ -121,6 +141,25 @@ SubjectProvider<int>(
 ```
 
 ※consumeするほうは同じ
+
+#### ValueNotifier
+
+#### Redux
+
+https://pub.dev/packages/flutter_redux
+
+Reduxは状態を扱うStoreがアプリ内にひとつだけ存在する。
+このため、状態の管理が中央で行われ、扱いやすい。
+
+しかしながら、このStoreにはアプリ内のさまざまな状態が含まれる。
+
+どれかを更新すると、すべての関連するWidgetの問い合わせの処理
+（Storeから一部の状態を取り出してViewModelを作る）が実行される。
+
+Widgetのrebuildではないが、不要な処理が実行されることになり、
+アプリが大きくなったときのパフォーマンス上の懸念のため、採用しない。
+
+※どの程度の影響があるか計測はしていない
 
 ## イベントハンドリング
 

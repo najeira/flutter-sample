@@ -7,7 +7,9 @@ import 'package:store_builder/store_builder.dart';
 import 'package:flutter_sample/app/blocs/blocs.dart';
 import 'package:flutter_sample/app/helpers/datetime.dart';
 import 'package:flutter_sample/app/helpers/enum.dart';
+import 'package:flutter_sample/app/widgets/indicator.dart';
 import 'package:flutter_sample/domain/models/models.dart';
+import 'package:flutter_sample/helpers/logger.dart';
 
 class ConfigPage extends StatelessWidget {
   const ConfigPage._({
@@ -31,11 +33,11 @@ class ConfigPage extends StatelessWidget {
   }
 
   static Widget _buildWithState(BuildContext context, ConfigState state, Widget child) {
-    final bool loading = state is ConfigLoading || state is ConfigInitial;
+    final bool loading = state is ConfigLoading;
     return Stack(
       children: <Widget>[
-        child,
-        if (loading) const CircularProgressIndicator(),
+        const ConfigScaffold(),
+        if (loading) const MyIndicator(),
       ],
     );
   }
@@ -62,6 +64,7 @@ class ConfigScaffold extends StatelessWidget {
   }
 
   static Widget _buildWithSubject(BuildContext context, StoredSubject<Config> subject, Widget child) {
+    logger.info("ConfigScaffold ${subject.runtimeType}(${identityHashCode(subject)})");
     return Column(
       children: <Widget>[
         SwitchListTile(
@@ -71,6 +74,13 @@ class ConfigScaffold extends StatelessWidget {
             // イベントの発生箇所は現在の状態を知る必要がない
             // 発生したイベントをdispatchし、ハンドラが現在の状態に応じて処理を行う
             const ConfigThemeChange().dispatch(context);
+          },
+        ),
+        SwitchListTile(
+          title: const Text("Android風ページ遷移"),
+          value: subject.value.androidPageTransition,
+          onChanged: (bool value) {
+            const ConfigPageTransitonChange().dispatch(context);
           },
         ),
       ],

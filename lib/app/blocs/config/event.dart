@@ -11,3 +11,7 @@ class ConfigStart extends ConfigEvent {
 class ConfigThemeChange extends ConfigEvent {
   const ConfigThemeChange();
 }
+
+class ConfigPageTransitonChange extends ConfigEvent {
+  const ConfigPageTransitonChange();
+}
