@@ -4,7 +4,7 @@ import 'package:flutter_sample/domain/domain.dart';
 import 'package:flutter_sample/infra/infra.dart';
 
 T getIt<T>([String instanceName]) {
-  return GetIt.instance.get<T>(instanceName);
+  return GetIt.instance.get<T>(instanceName: instanceName);
 }
 
 void registerServices() {

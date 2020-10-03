@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_sample/app/helpers/datetime.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:flutter_sample/app/helpers/datetime.dart';
 import 'package:flutter_sample/domain/models/models.dart';
 import 'package:flutter_sample/helpers/logger.dart';
 
@@ -65,42 +67,41 @@ class ArticleDetailView extends ConsumerWidget {
     logger.info("${runtimeType}.build");
     final Article article = watch(_articleProvider);
     final ThemeData theme = Theme.of(context);
-    return ListView.builder(
-      itemBuilder: (BuildContext context, int index) {
-        switch (index) {
-          case 0:
-            return Text(
-              formatDateTimeString(article.publishedAt),
-              style: theme.textTheme.caption,
-            );
-          case 1:
-            return Text(
-              article.title ?? "-",
-              style: theme.textTheme.headline5,
-            );
-          case 2:
-            return ArticleImage(article.urlToImage);
-          case 3:
-            return Text(
-              article.description ?? "-",
-              style: theme.textTheme.bodyText2,
-            );
-          case 4:
-            return RaisedButton(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const <Widget>[
-                  Text("詳しく見る"),
-                  SizedBox(width: 4.0),
-                  Icon(Icons.open_in_new),
-                ],
-              ),
-              onPressed: () {},
-            );
-          default:
-            return null;
-        }
-      },
+    return ListView(
+      children: <Widget>[
+        Text(
+          formatDateTimeString(article.publishedAt),
+          style: theme.textTheme.caption,
+        ),
+        const SizedBox(height: 8.0),
+        Text(
+          article.title ?? "-",
+          style: theme.textTheme.headline5,
+        ),
+        const SizedBox(height: 8.0),
+        ArticleImage(article.urlToImage),
+        const SizedBox(height: 8.0),
+        Text(
+          article.description ?? "-",
+          style: theme.textTheme.bodyText2,
+        ),
+        const SizedBox(height: 8.0),
+        RaisedButton(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const <Widget>[
+              Text("詳しく見る"),
+              SizedBox(width: 4.0),
+              Icon(Icons.open_in_new),
+            ],
+          ),
+          onPressed: () async {
+            if (await canLaunch(article.url)) {
+              await launch(article.url);
+            }
+          },
+        ),
+      ],
     );
   }
 }
