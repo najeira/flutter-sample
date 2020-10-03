@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
-import 'package:store_builder/store_builder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:flutter_sample/app/blocs/blocs.dart';
-import 'package:flutter_sample/app/helpers/datetime.dart';
-import 'package:flutter_sample/app/helpers/enum.dart';
-import 'package:flutter_sample/app/helpers/provider.dart';
+import 'package:flutter_sample/app/providers.dart';
+import 'package:flutter_sample/app/widgets/indicator.dart';
 import 'package:flutter_sample/domain/models/models.dart';
 import 'package:flutter_sample/helpers/logger.dart';
 
@@ -15,28 +11,30 @@ import '../config/config.dart';
 
 import 'detail.dart';
 
-class ArticleListPage extends StatelessWidget {
+/// [ArticleListTile] で表示される [Article] を提供する
+final ScopedProvider<Article> _articleProvider = ScopedProvider<Article>(null);
+
+class ArticleListPage extends ConsumerWidget {
   const ArticleListPage({
     Key key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return SubjectProvider<ArticleList>(
-      id: kArticleListID,
-      child: ArticleListHandler(
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text("Flutter勉強会"),
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.settings),
-                onPressed: () => _onSettingsTap(context),
-              ),
-            ],
+  Widget build(BuildContext context, ScopedReader watch) {
+    logger.info("${runtimeType}.build");
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Top headlines"),
+        actions: <Widget>[
+          IconButton(
+            icon: const Icon(Icons.settings),
+            onPressed: () => _onSettingsTap(context),
           ),
-          body: const ArticleListView(),
-        ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => context.refresh(articleListProvider),
+        child: const ArticleListView(),
       ),
     );
   }
@@ -46,41 +44,51 @@ class ArticleListPage extends StatelessWidget {
   }
 }
 
-class ArticleListView extends StatelessWidget {
+class ArticleListView extends ConsumerWidget {
   const ArticleListView({
     Key key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<ArticleList>(
-      builder: _buildWithValue,
+  Widget build(BuildContext context, ScopedReader watch) {
+    logger.info("${runtimeType}.build");
+    final AsyncValue<ArticleList> future = watch(articleListProvider);
+    return future.when<Widget>(
+      data: (ArticleList data) {
+        return _buildList(context, data);
+      },
+      loading: () {
+        return _buildLoading(context);
+      },
+      error: (Object error, StackTrace stackTrace) {
+        logger.errorException(error, stackTrace);
+        return _buildError(context, error);
+      },
     );
   }
 
-  static Widget _buildWithValue(BuildContext context, ArticleList articleList, Widget child) {
-    logger.info("ArticleListView ${articleList?.count}");
+  Widget _buildLoading(BuildContext context) {
+    return ListView(
+      children: const <Widget>[
+        MyIndicator(),
+      ],
+    );
+  }
 
-    final ArticleListState state = Provider.of<ArticleListState>(context, listen: true);
-    final bool loading = state is ArticleListLoading || state is ArticleListInital;
-    final bool hasNext = state is! ArticleListFinish;
+  Widget _buildError(BuildContext context, Object error) {
+    return ListView(
+      children: <Widget>[
+        ErrorWidget(error),
+      ],
+    );
+  }
 
+  Widget _buildList(BuildContext context, ArticleList articleList) {
     final int count = articleList?.articles?.length ?? 0;
-
     return ListView.separated(
-      itemCount: count + 1,
+      itemCount: count,
       itemBuilder: (BuildContext context, int index) {
         if (index == count) {
-          if (loading) {
-            return const _ListLoading();
-          }
-
-          if (hasNext) {
-            // 最後まで読み込んだので次へのイベントを発行する
-            // 多重読み込みの防止はBloc側で行われる
-            const ArticleListNext().dispatch(context);
-          }
-
           return const _ListTail();
         } else if (index > count) {
           // itemCountを指定しているのでここには来ないはず
@@ -88,9 +96,10 @@ class ArticleListView extends StatelessWidget {
         }
 
         final Article article = articleList.articles[index];
-        return SubjectProvider<Article>(
-          initalValue: article,
-          id: article.id,
+        return ProviderScope(
+          overrides: <Override>[
+            _articleProvider.overrideWithValue(article),
+          ],
           child: const ArticleListTile(),
         );
       },
@@ -101,73 +110,22 @@ class ArticleListView extends StatelessWidget {
   }
 }
 
-class ArticleListTile extends StatelessWidget {
+class ArticleListTile extends ConsumerWidget {
   const ArticleListTile({
     Key key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return ArticleDetailHandler(
-      child: Consumer<Article>(
-        builder: _buildWithValue,
-      ),
-    );
-  }
-
-  Widget _buildWithValue(BuildContext context, Article article, Widget child) {
-    logger.info("${runtimeType}(${identityHashCode(this)}) ${article?.id}");
-
+  Widget build(BuildContext context, ScopedReader watch) {
+    final Article article = watch(_articleProvider);
+    logger.info("${runtimeType}.build ${article?.title}");
     return ListTile(
       title: Text(article.title),
-      subtitle: Text(formatDateTime(article.startAt)),
-      trailing: ProxyProvider<Article, bool>(
-        create: (BuildContext context) => article.favorite,
-        update: (BuildContext context, Article article, bool previous) => article.favorite,
-        child: const ArticleListFavoriteButton(),
-      ),
+      subtitle: Text(article.publishedAt),
+      trailing: const Icon(Icons.arrow_forward_ios),
       onTap: () {
-        // ここもイベントにするべきだろうか？
         ArticleDetailPage.push(context, article);
       },
-    );
-  }
-}
-
-class ArticleListFavoriteButton extends StatelessWidget {
-  const ArticleListFavoriteButton({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<bool>(
-      builder: (BuildContext context, bool favorite, Widget child) {
-        final Color accentColor = Theme.of(context).accentColor;
-        return IconButton(
-          icon: Icon(
-            favorite ? Icons.favorite : Icons.favorite_border,
-            color: favorite ? accentColor : null,
-          ),
-          onPressed: () {
-            const ArticleDetailFavorite().dispatch(context);
-          },
-        );
-      },
-    );
-  }
-}
-
-class _ListLoading extends StatelessWidget {
-  const _ListLoading();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(16.0),
-      child: Center(
-        child: CircularProgressIndicator(),
-      ),
     );
   }
 }
@@ -182,15 +140,8 @@ class _ListTail extends StatelessWidget {
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text("powered by"),
-            const SizedBox(width: 4.0),
-            Image.network(
-              "https://connpass.com/static/img/api/connpass_logo_1.png",
-              fit: BoxFit.contain,
-              width: 125,
-              height: 42,
-            ),
+          children: const <Widget>[
+            Text("powered by newsapi.org"),
           ],
         ),
       ),

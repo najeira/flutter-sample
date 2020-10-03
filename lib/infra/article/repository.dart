@@ -1,33 +1,24 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart' show debugPrint;
-
 import 'package:http/http.dart' as http;
 
 import 'package:flutter_sample/domain/models/article.dart';
+import 'package:flutter_sample/helpers/logger.dart';
 
 class RemoteRepository {
-  const RemoteRepository(
-    this.host,
-    this.path,
-  );
+  const RemoteRepository();
 
-  final String host;
-
-  final String path;
-
-  Future<ArticleList> articleList([ArticleList before]) async {
-    final int start = (before != null) ? (before.start + before.count) : 1;
+  Future<ArticleList> articleList() async {
     final Uri uri = Uri.https(
-      host,
-      path,
+      "newsapi.org",
+      "/v2/top-headlines",
       <String, String>{
-        "keyword": "Flutter",
-        "start": start.toString(),
-        "count": "20",
+        "country": "jp",
+        "apiKey": "250092088c2447f69a872c7f0d4e1709",
+        "pageSize": "100",
       },
     );
-    debugPrint("${uri}");
+    logger.info(uri.toString());
 
     final http.Response resp = await http.get(uri);
 

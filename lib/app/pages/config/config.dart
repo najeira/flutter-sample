@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
-import 'package:store_builder/store_builder.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:flutter_sample/app/blocs/blocs.dart';
-import 'package:flutter_sample/app/helpers/datetime.dart';
-import 'package:flutter_sample/app/helpers/enum.dart';
-import 'package:flutter_sample/app/widgets/indicator.dart';
-import 'package:flutter_sample/domain/models/models.dart';
+import 'package:flutter_sample/app/providers.dart';
+import 'package:flutter_sample/app/states/config.dart';
 import 'package:flutter_sample/helpers/logger.dart';
 
 class ConfigPage extends StatelessWidget {
@@ -24,63 +19,40 @@ class ConfigPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const SubjectProvider<Config>(
-      id: kConfigID,
-      child: ConfigHandler(
-        builder: _buildWithState,
-      ),
-    );
-  }
-
-  static Widget _buildWithState(BuildContext context, ConfigState state, Widget child) {
-    final bool loading = state is ConfigLoading;
-    return Stack(
-      children: <Widget>[
-        const ConfigScaffold(),
-        if (loading) const MyIndicator(),
-      ],
-    );
-  }
-}
-
-class ConfigScaffold extends StatelessWidget {
-  const ConfigScaffold({
-    Key key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("設定"),
       ),
       body: const SingleChildScrollView(
-        child: SubjectBuilder<Config>(
-          id: kConfigID,
-          builder: _buildWithSubject,
-        ),
+        child: ConfigColumn(),
       ),
     );
   }
+}
 
-  static Widget _buildWithSubject(BuildContext context, StoredSubject<Config> subject, Widget child) {
-    logger.info("ConfigScaffold ${subject.runtimeType}(${identityHashCode(subject)})");
+class ConfigColumn extends ConsumerWidget {
+  const ConfigColumn({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, ScopedReader watch) {
+    final ConfigController data = watch(configProvider);
+    logger.info("${runtimeType}.build");
     return Column(
       children: <Widget>[
         SwitchListTile(
           title: const Text("ダーク・モード"),
-          value: subject.value.darkTheme,
+          value: data.config.darkTheme,
           onChanged: (bool value) {
-            // イベントの発生箇所は現在の状態を知る必要がない
-            // 発生したイベントをdispatchし、ハンドラが現在の状態に応じて処理を行う
-            const ConfigThemeChange().dispatch(context);
+            context.read(configProvider).setDarkTheme(value);
           },
         ),
         SwitchListTile(
           title: const Text("Android風ページ遷移"),
-          value: subject.value.androidPageTransition,
+          value: data.config.androidPageTransition,
           onChanged: (bool value) {
-            const ConfigPageTransitonChange().dispatch(context);
+            context.read(configProvider).setAndroidPageTransition(value);
           },
         ),
       ],

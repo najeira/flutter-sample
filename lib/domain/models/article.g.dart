@@ -6,33 +6,56 @@ part of 'article.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Article _$ArticleFromJson(Map<String, dynamic> json) {
-  return Article(
-    json['event_id'] as int,
-    json['title'] as String,
-    json['catch'] as String,
-    json['description'] as String,
-    json['place'] as String,
-    json['address'] as String,
-    json['event_url'] as String,
-    json['started_at'] == null
-        ? null
-        : DateTime.parse(json['started_at'] as String),
-    json['end_at'] == null ? null : DateTime.parse(json['end_at'] as String),
-    json['limit'] as int,
-    json['accepted'] as int,
-    json['waiting'] as int,
+_$_ArticleSource _$_$_ArticleSourceFromJson(Map<String, dynamic> json) {
+  return _$_ArticleSource(
+    id: json['id'] as String,
+    name: json['name'] as String,
   );
 }
 
-ArticleList _$ArticleListFromJson(Map<String, dynamic> json) {
-  return ArticleList(
-    json['results_start'] as int,
-    json['results_returned'] as int,
-    json['results_available'] as int,
-    (json['events'] as List)
+Map<String, dynamic> _$_$_ArticleSourceToJson(_$_ArticleSource instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+    };
+
+_$_Article _$_$_ArticleFromJson(Map<String, dynamic> json) {
+  return _$_Article(
+    source: json['source'] == null
+        ? null
+        : ArticleSource.fromJson(json['source'] as Map<String, dynamic>),
+    title: json['title'] as String,
+    description: json['description'] as String,
+    author: json['author'] as String,
+    url: json['url'] as String,
+    urlToImage: json['urlToImage'] as String,
+    publishedAt: json['publishedAt'] as String,
+    content: json['content'] as String,
+  );
+}
+
+Map<String, dynamic> _$_$_ArticleToJson(_$_Article instance) =>
+    <String, dynamic>{
+      'source': instance.source,
+      'title': instance.title,
+      'description': instance.description,
+      'author': instance.author,
+      'url': instance.url,
+      'urlToImage': instance.urlToImage,
+      'publishedAt': instance.publishedAt,
+      'content': instance.content,
+    };
+
+_$_ArticleList _$_$_ArticleListFromJson(Map<String, dynamic> json) {
+  return _$_ArticleList(
+    (json['articles'] as List)
         ?.map((e) =>
             e == null ? null : Article.fromJson(e as Map<String, dynamic>))
         ?.toList(),
   );
 }
+
+Map<String, dynamic> _$_$_ArticleListToJson(_$_ArticleList instance) =>
+    <String, dynamic>{
+      'articles': instance.articles,
+    };
