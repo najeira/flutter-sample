@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flutter_sample/app/providers.dart';
+import 'package:flutter_sample/app/helpers/datetime.dart';
 import 'package:flutter_sample/app/widgets/indicator.dart';
 import 'package:flutter_sample/domain/models/models.dart';
 import 'package:flutter_sample/helpers/logger.dart';
@@ -86,7 +87,7 @@ class ArticleListView extends ConsumerWidget {
   Widget _buildList(BuildContext context, ArticleList articleList) {
     final int count = articleList?.articles?.length ?? 0;
     return ListView.separated(
-      itemCount: count,
+      itemCount: count + 1,
       itemBuilder: (BuildContext context, int index) {
         if (index == count) {
           return const _ListTail();
@@ -121,7 +122,7 @@ class ArticleListTile extends ConsumerWidget {
     logger.info("${runtimeType}.build ${article?.title}");
     return ListTile(
       title: Text(article.title),
-      subtitle: Text(article.publishedAt),
+      subtitle: Text(formatDateTimeString(article.publishedAt)),
       trailing: const Icon(Icons.arrow_forward_ios),
       onTap: () {
         ArticleDetailPage.push(context, article);
