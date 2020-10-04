@@ -7,8 +7,11 @@ class MyIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: CircularProgressIndicator(),
+    return const Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 }

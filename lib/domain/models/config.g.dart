@@ -6,14 +6,14 @@ part of 'config.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-Config _$ConfigFromJson(Map<String, dynamic> json) {
-  return Config(
-    json['darkTheme'] as bool ?? false,
-    json['androidPageTransition'] as bool ?? false,
+_$_Config _$_$_ConfigFromJson(Map<String, dynamic> json) {
+  return _$_Config(
+    darkTheme: json['darkTheme'] as bool ?? false,
+    androidPageTransition: json['androidPageTransition'] as bool ?? false,
   );
 }
 
-Map<String, dynamic> _$ConfigToJson(Config instance) => <String, dynamic>{
+Map<String, dynamic> _$_$_ConfigToJson(_$_Config instance) => <String, dynamic>{
       'darkTheme': instance.darkTheme,
       'androidPageTransition': instance.androidPageTransition,
     };

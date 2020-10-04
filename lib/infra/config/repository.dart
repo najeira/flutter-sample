@@ -16,7 +16,10 @@ class ConfigRepository {
     final Box<String> box = await _box();
     final String data = box.get(_key);
     if (data == null || data.isEmpty) {
-      return const Config.inital();
+      return const Config(
+        darkTheme: false,
+        androidPageTransition: false,
+      );
     }
     return Config.fromJson(json.decode(data) as Map<String, dynamic>);
   }

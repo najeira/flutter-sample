@@ -1,4 +1,6 @@
-import '_imports.dart';
+import 'package:flutter_sample/domain/models/models.dart';
+import 'package:flutter_sample/helpers/get_it.dart';
+import 'package:flutter_sample/infra/infra.dart';
 
 class ConfigService {
   const ConfigService();

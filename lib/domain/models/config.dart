@@ -1,36 +1,15 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:flutter/foundation.dart';
 
+part 'config.freezed.dart';
 part 'config.g.dart';
 
-@JsonSerializable()
-class Config {
-  const Config(
-    this.darkTheme,
-    this.androidPageTransition,
-  ) : assert(darkTheme != null);
-
-  const Config.inital() : this(
-    false,
-    false,
-  );
+@freezed
+abstract class Config with _$Config {
+  const factory Config({
+    @Default(false) bool darkTheme,
+    @Default(false) bool androidPageTransition,
+  }) = _Config;
 
   factory Config.fromJson(Map<String, dynamic> json) => _$ConfigFromJson(json);
-
-  @JsonKey(defaultValue: false)
-  final bool darkTheme;
-
-  @JsonKey(defaultValue: false)
-  final bool androidPageTransition;
-
-  Map<String, dynamic> toJson() => _$ConfigToJson(this);
-
-  Config copyWith({
-    bool darkTheme,
-    bool androidPageTransition,
-  }) {
-    return Config(
-      darkTheme ?? this.darkTheme,
-      androidPageTransition ?? this.androidPageTransition,
-    );
-  }
 }
