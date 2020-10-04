@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flutter_sample/app/providers.dart';
-import 'package:flutter_sample/app/states/config.dart';
+import 'package:flutter_sample/domain/domain.dart';
 import 'package:flutter_sample/helpers/logger.dart';
 
 class ConfigPage extends StatelessWidget {
@@ -37,22 +37,22 @@ class ConfigColumn extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ScopedReader watch) {
-    final ConfigController data = watch(configProvider);
+    final Config config = watch(configNotifierProvider.state);
     logger.info("${runtimeType}.build");
     return Column(
       children: <Widget>[
         SwitchListTile(
           title: const Text("ダーク・モード"),
-          value: data.config.darkTheme,
+          value: config.darkTheme,
           onChanged: (bool value) {
-            context.read(configProvider).setDarkTheme(value);
+            context.read(configNotifierProvider).setDarkTheme(value);
           },
         ),
         SwitchListTile(
           title: const Text("Android風ページ遷移"),
-          value: data.config.androidPageTransition,
+          value: config.androidPageTransition,
           onChanged: (bool value) {
-            context.read(configProvider).setAndroidPageTransition(value);
+            context.read(configNotifierProvider).setAndroidPageTransition(value);
           },
         ),
       ],

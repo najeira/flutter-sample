@@ -4,14 +4,38 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:flutter_sample/app/providers.dart';
 import 'package:flutter_sample/app/states/config.dart';
+import 'package:flutter_sample/domain/domain.dart';
 import 'package:flutter_sample/helpers/logger.dart';
 
 import 'article/list.dart';
 
+class MyApp extends StatelessWidget {
+  const MyApp({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ProviderListener<AsyncValue<Config>>(
+      onChange: (BuildContext context, AsyncValue<Config> data) {
+        logger.info("ProviderListener.onChange");
+        final ConfigNotifier notifier = context.read(configNotifierProvider);
+        data.when(
+          data: (Config value) => notifier.config = value,
+          loading: () {},
+          error: (_, __) => notifier.config = const Config(),
+        );
+      },
+      provider: storedConfigProvider,
+      child: const _MyApp(),
+    );
+  }
+}
+
 /// アプリの設定やグローバルな状態を扱う
 /// このクラス自体はUIを持たない
-class MyApp extends ConsumerWidget {
-  const MyApp({
+class _MyApp extends ConsumerWidget {
+  const _MyApp({
     Key key,
   }) : super(key: key);
 
@@ -36,9 +60,9 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ScopedReader watch) {
     logger.info("${runtimeType}.build");
-    final ConfigController data = watch(configProvider);
-    final bool dark = data?.config?.darkTheme ?? false;
-    final bool android = data?.config?.androidPageTransition ?? false;
+    final Config config = watch(configNotifierProvider.state);
+    final bool dark = config?.darkTheme ?? false;
+    final bool android = config?.androidPageTransition ?? false;
     final ThemeData colorTheme = ThemeData.from(
       colorScheme: dark ? const ColorScheme.dark() : const ColorScheme.light(),
     );
@@ -63,8 +87,8 @@ class _ConfigLoadingHandler extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ScopedReader watch) {
     logger.info("${runtimeType}.build");
-    final ConfigController data = watch(configProvider);
-    if (data?.config == null) {
+    final Config config = watch(configNotifierProvider.state);
+    if (config == null) {
       return const _WelcomePage();
     }
     return const ArticleListPage();
